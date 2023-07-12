@@ -1,6 +1,8 @@
 package com.bilibili.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bilibili.dao.UserDao;
+import com.bilibili.domain.PageResult;
 import com.bilibili.domain.User;
 import com.bilibili.domain.UserInfo;
 import com.bilibili.domain.constant.UserConstant;
@@ -12,7 +14,7 @@ import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -109,4 +111,26 @@ public class UserService {
         userInfo.setUpdateTime(new Date());
         userDao.updateUserInfos(userInfo);
     }
+
+    public User getUserById(Long followingId) {
+        return userDao.getUserById(followingId);
+    }
+
+    public List<UserInfo> getUserInfoByUserIds(Set<Long> userIdList) {
+        return userDao.getUserInfoByUserIds(userIdList);
+    }
+
+    public PageResult<UserInfo> pageListUserInfos(JSONObject params) {
+        Integer no = params.getInteger("no");
+        Integer size = params.getInteger("size");
+        params.put("start", (no - 1) * size);
+        params.put("limit", size);
+        Integer total = userDao.pageCountUserInfos(params);
+        List<UserInfo> list = new ArrayList<>();
+        if (total > 0) {
+            list = userDao.pageListUserInfos(params);
+        }
+        return new PageResult<>(total, list);
+    }
+
 }
