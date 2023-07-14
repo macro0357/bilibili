@@ -3,7 +3,7 @@
 
 <mapper namespace="com.bilibili.dao.AuthRoleDao">
 
-    <select id="getRoleByCode" parameterType="java.lang.String" resultMap="com.bilibili.domain.auth.AuthRole">
+    <select id="getRoleByCode" parameterType="java.lang.String" resultType="com.bilibili.domain.auth.AuthRole">
         select
             *
         from
