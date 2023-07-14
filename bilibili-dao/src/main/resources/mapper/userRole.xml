@@ -14,5 +14,18 @@
         where
             ur.userId = #{userId}
     </select>
+    
+    <insert id="addUserRole" parameterType="com.bilibili.domain.auth.UserRole">
+        insert into
+            t_user_role(
+                userId,
+                roleId,
+                createTime
+            ) values (
+                #{userId},
+                #{roleId},
+                #{createTime}
+            )
+    </insert>
 
 </mapper>
