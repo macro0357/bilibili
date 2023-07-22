@@ -85,7 +85,7 @@ public class UserApi {
         return new JsonResponse<>(result);
     }
 
-    @PostMapping("/user-dts")
+    @PostMapping("/user-dts") //获取双token
     public JsonResponse<Map<String, Object>> loginForDts(@RequestBody User user) throws Exception {
         Map<String, Object> map = userService.loginForDts(user);
         return new JsonResponse<>(map);

@@ -26,6 +26,9 @@ public class UserService {
     @Autowired
     private UserAuthService userAuthService;
 
+    @Autowired
+    private ElasticSearchService elasticSearchService;
+
     public void addUser(User user) {
         String phone = user.getPhone();
         if (StringUtils.isNullOrEmpty(phone)) {
@@ -59,6 +62,8 @@ public class UserService {
         userDao.addUserInfo(userInfo);
         //添加用户默认角色
         userAuthService.addUserDefaultRole(user.getId());
+        //同步用户信息数据到es
+        elasticSearchService.addUserInfo(userInfo);
     }
 
     public User getUserByPhone(String phone) {
@@ -188,5 +193,9 @@ public class UserService {
 
     public List<UserInfo> batchGetUserInfoByUserIds(Set<Long> userIdList) {
         return userDao.batchGetUserInfoByUserIds(userIdList);
+    }
+
+    public String getRefreshTokenByUserId(Long userId) {
+        return userDao.getRefreshTokenByUserId(userId);
     }
 }
