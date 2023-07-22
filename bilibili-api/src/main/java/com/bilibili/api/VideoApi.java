@@ -4,11 +4,13 @@ import com.bilibili.api.support.UserSupport;
 import com.bilibili.domain.*;
 import com.bilibili.service.ElasticSearchService;
 import com.bilibili.service.VideoService;
+import org.apache.mahout.cf.taste.common.TasteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -171,7 +173,6 @@ public class VideoApi {
     }
 
 
-
     /**
      * 获取视频详情
      */
@@ -179,6 +180,53 @@ public class VideoApi {
     public JsonResponse<Map<String, Object>> getVideoDetails(@RequestParam Long videoId){
         Map<String, Object> result = videoService.getVideoDetails(videoId);
         return new JsonResponse<>(result);
+    }
+
+
+    /**
+     * 添加视频观看记录
+     */
+    @PostMapping("/video-views")
+    public JsonResponse<String> addVideoView(@RequestBody VideoView videoView,
+                                             HttpServletRequest request){
+        Long userId;
+        try{
+            userId = userSupport.getCurrentUserId();
+            videoView.setUserId(userId);
+            videoService.addVideoView(videoView, request);
+        }catch (Exception e){
+            videoService.addVideoView(videoView, request);
+        }
+        return JsonResponse.success();
+    }
+
+    /**
+     * 查询视频播放量
+     */
+    @GetMapping("/video-view-counts")
+    public JsonResponse<Integer> getVideoViewCounts(@RequestParam Long videoId){
+        Integer count = videoService.getVideoViewCounts(videoId);
+        return new JsonResponse<>(count);
+    }
+
+    /**
+     * 视频内容推荐
+     */
+    @GetMapping("/recommendations")
+    public JsonResponse<List<Video>> recommend() throws TasteException {
+        Long userId = userSupport.getCurrentUserId();
+        List<Video> list = videoService.recommend(userId);
+        return new JsonResponse<>(list);
+    }
+
+    /**
+     * 视频帧截取生成黑白剪影
+     */
+    @GetMapping("/video-frames")
+    public JsonResponse<List<VideoBinaryPicture>> captureVideoFrame(@RequestParam Long videoId,
+                                                                    @RequestParam String fileMd5) throws Exception {
+        List<VideoBinaryPicture> list = videoService.convertVideoToImage(videoId, fileMd5);
+        return new JsonResponse<>(list);
     }
 
 }
